@@ -30,7 +30,7 @@ def main_worker(args):
     # create model
     print("=> using pre-trained model '{}'".format("resnet50"))
     model = models.__dict__["resnet50"](pretrained=True)
-#    device = torch.device("cpu")
+
     val_dataset = datasets.FakeData(
         50000, (3, 224, 224), 1000, transforms.ToTensor())
     val_sampler = None
