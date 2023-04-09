@@ -1,6 +1,6 @@
 '''
 A Demo app: resnet50
-Assume: dummy data, precision=float32, device=cpu
+Assume: dummy data, precision=float32, device=cpu, batch-size=64, evaluate
 Sample cmd: python3 <file>.py --num_warmup 10 --num_iter  50
 '''
 # pylint: disable=consider-using-f-string,multiple-statements
