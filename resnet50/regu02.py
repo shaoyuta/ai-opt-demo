@@ -3,7 +3,7 @@ A Demo app: resnet50
 Assume: dummy data, precision=float32, device=[cpu, cuda, hpu], batch-size=64, evaluate
 Sample cmd: python3 <file>.py --num_warmup 10 --num_iter 50 --device cuda
 '''
-# pylint: disable=consider-using-f-string,multiple-statements
+# pylint: disable=consider-using-f-string,multiple-statements,import-error,unused-import
 
 import argparse
 import time
@@ -51,7 +51,7 @@ def main_worker(args):
     if args.device == "cuda":
         model.to(device)
     elif args.device == 'hpu':
-#        model = ht.hpu.wrap_in_hpu_graph(model)  
+        #        model = ht.hpu.wrap_in_hpu_graph(model)
         model.to(device)
     val_dataset = datasets.FakeData(
         50000, (3, 224, 224), 1000, transforms.ToTensor())
