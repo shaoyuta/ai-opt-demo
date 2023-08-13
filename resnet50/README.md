@@ -15,3 +15,11 @@
   - train: ```python3 chap01.py --num_warmup 10 --num_iter 50 --data=/home/taosy/resnet50 ```
   - evaluate: ```python3 chap01.py --num_warmup 10 --num_iter 50 --data=/home/taosy/datasets/resnet50 --evaluate```
   - use pretrained model: ```--pretrained```
+
+- demo.ipynb:
+  - Performance comparision: none, ipex, jit, dynamo, int8
+  - Profile
+
+- demo2.ipynb:
+  - ONEDNN_VERBOSE format
+  - Performance comparision from verbose side
