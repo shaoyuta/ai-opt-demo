@@ -23,3 +23,6 @@
 - demo2.ipynb:
   - ONEDNN_VERBOSE format
   - Performance comparision from verbose side
+
+- demo3.ipynb:
+  - jit when ipex is loaded or not
