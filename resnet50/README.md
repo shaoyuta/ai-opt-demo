@@ -1,0 +1,3 @@
+- regu00.py: rn50 + validate + cpu
+- regu01.py: regu00.py + cuda
+- regu02.py: regu01.py + hpu
