@@ -18,6 +18,7 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import Subset
+import intel_extension_for_pytorch as ipex
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
@@ -58,12 +59,14 @@ parser.add_argument('--dummy', action='store_true', help="use fake data to bench
 # for oob
 parser.add_argument('--precision', type=str, default='float32', help='precision')
 parser.add_argument('--channels_last', type=int, default=1, help='use channels last format')
-parser.add_argument('--num_iter', type=int, default=-1, help='num_iter')
-parser.add_argument('--num_warmup', type=int, default=-1, help='num_warmup')
+parser.add_argument('--num_iter', type=int, default=20, help='num_iter')
+parser.add_argument('--num_warmup', type=int, default=5, help='num_warmup')
 parser.add_argument('--profile', dest='profile', action='store_true', help='profile')
 parser.add_argument('--quantized_engine', type=str, default=None, help='quantized_engine')
 parser.add_argument('--ipex', dest='ipex', action='store_true', help='ipex')
 parser.add_argument('--jit', dest='jit', action='store_true', help='jit')
+parser.add_argument('--torch_compile', dest='torch_compile', action='store_true', help='torch_compile')
+
 
 best_acc1 = 0
 
@@ -89,17 +92,12 @@ def main():
                       'You may see unexpected behavior when restarting '
                       'from checkpoints.')
 
-    if args.gpu is not None:
-        warnings.warn('You have chosen a specific GPU. This will completely '
-                      'disable data parallelism.')
-
     # Simply call main_worker function
-    main_worker(args.gpu, 1, args)
+    main_worker(1, args)
 
 
-def main_worker(gpu, ngpus_per_node, args):
+def main_worker(ngpus_per_node, args):
     global best_acc1
-    args.gpu = gpu
 
     # create model
     if args.pretrained:
@@ -117,7 +115,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
-                                weight_decay=args.weight_decay)
+                                weight_decay=1e-4)
     
     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
     scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
@@ -244,10 +242,6 @@ def train(train_loader, model, criterion, optimizer, epoch, device, args):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % args.print_freq == 0:
-            progress.display(i + 1)
-
-
 def validate(val_loader, model, criterion, args):
     def trace_handler(p):
         output = p.key_averages().table(sort_by="self_cpu_time_total")
@@ -277,7 +271,7 @@ def validate(val_loader, model, criterion, args):
 
                 # compute output
                 output = model(images)
-                loss = criterion(output, target)
+
                 elapsed = time.time() - elapsed
                 if args.profile:
                     p.step()
@@ -285,6 +279,7 @@ def validate(val_loader, model, criterion, args):
                 if i >= args.num_warmup:
                     total_time += elapsed
                     total_sample += args.batch_size
+                loss = criterion(output, target)
 
                 # measure accuracy and record loss
                 acc1, acc5 = accuracy(output, target, topk=(1, 5))
@@ -296,10 +291,11 @@ def validate(val_loader, model, criterion, args):
                 batch_time.update(time.time() - end)
                 end = time.time()
 
-                if i % args.print_freq == 0:
-                    progress.display(i + 1)
+#                if i % args.print_freq == 0:
+#                    progress.display(i + 1)
             throughput = total_sample / total_time
             latency = total_time / total_sample * 1000
+            progress.display_summary()
             print('inference latency: %f ms' % latency)
             print('inference Throughput: %3f images/s' % throughput)
 
@@ -339,23 +335,23 @@ def validate(val_loader, model, criterion, args):
             model = torch.jit.trace(model, sample_input)
             model = torch.jit.freeze(model)
             print('---- Use traced model')
+    
+    if args.ipex:
+        model.eval()
+        model=ipex.optimize(model)
+    
+    if args.torch_compile:
+        model=torch.compile(model)
 
     if args.profile:
         with torch.profiler.profile(
-            activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
+            activities=[torch.profiler.ProfilerActivity.CPU],
             record_shapes=True,
-            schedule=torch.profiler.schedule(
-                wait=int(args.num_iter/2),
-                warmup=2,
-                active=1,
-            ),
-            on_trace_ready=trace_handler,
         ) as p:
             run_validate(val_loader, p=p)
+        print(p.key_averages().table(sort_by="self_cpu_time_total",row_limit=10))
     else:
         run_validate(val_loader)
-
-    progress.display_summary()
 
     return top1.avg
 

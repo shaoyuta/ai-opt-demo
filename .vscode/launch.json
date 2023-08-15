@@ -20,7 +20,7 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args":[
-                "--data=/home/taosy/datasets/resnet50", "--evaluate", "--pretrained"
+                "--data=/home/taosy/datasets/resnet50", "--evaluate", "--pretrained", "--ipex"
             ]
         }
     ]
