@@ -10,6 +10,8 @@
 
 - opt-plan-1:
     - optimize in transformers
+        - hardcode in "greedy_search()", "beem_search()" (utils.py)
+        - change behavia in GPTJAttention::forward()
     - new ipex op "rotary_position_embedding"
 - opt-plan-2:
     - replace function in ipex transformer
