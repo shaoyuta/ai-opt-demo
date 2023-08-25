@@ -29,7 +29,7 @@
             "request": "launch",
             "program": "gptj/run_generation.py",
             "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
             "args":[
                 "--device=cpu", "--input-tokens=32", "--max-new-tokens=32",
                 "--num-iter=15", "--num-warmup=5", "--batch-size=1", "-m=EleutherAI/gpt-j-6b",
@@ -46,7 +46,7 @@
             "request": "launch",
             "program": "gptj/run_generation_ipex_llm_test.py",
             "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
             "args":[
                 "--device=cpu", "--benchmark", "--input-tokens=32", "--max-new-tokens=32",
                 "--num-iter=15", "--num-warmup=5", "--batch-size=1", "-m=EleutherAI/gpt-j-6b",
@@ -63,7 +63,7 @@
             "request": "launch",
             "program": "gptj/run_generation_ipex_llm.py",
             "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
             "args":[
                 "--device=cpu", "--benchmark", "--input-tokens=32", "--max-new-tokens=32",
                 "--num-iter=15", "--num-warmup=5", "--batch-size=1", "-m=EleutherAI/gpt-j-6b",
