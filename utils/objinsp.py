@@ -69,6 +69,8 @@ class comp_ret():
             for ki in self.both[keys]:
                 if not _canbe_filter_out(ki, filter):
                     self.both_filter[keys].append(ki)
+        self.both_filter_diff=self.both_filter.copy()
+        self.both_filter_diff.pop("all-same")
 
     def filter_out(self, filter=DEFAULT_FILTER, whitelist=None):
         self.filter_out_added(filter, whitelist)
