@@ -9,6 +9,10 @@ DEFAULT_FILTER= {
     list:["__jit_unused_properties__"],
     dict:["_methods"],
     collections.OrderedDict:["*"],
+    "callable":["__str__", "__setattr__","__eq__","__ge__","__ne__","__hash__",
+                "__lt__","__le__","__gt__","__new__","__format__","__sizeof__","__getattr__",
+                "__init__","__reduce__","__getattribute__","__reduce_ex__",
+                "__subclasshook__", "__init_subclass__"],
 }
 
 
@@ -21,7 +25,7 @@ class kinfo():
     def __repr__(self):
         return "%30s:%30s"%(self.k, self.vtype)
     
-def _canbe_filter_out(ki, filter):
+def _canbe_filter_out(ki, filter):   # filter out items by rules
     if ki.vtype not in filter.keys():
         return False
     else:
@@ -69,8 +73,15 @@ class comp_ret():
             for ki in self.both[keys]:
                 if not _canbe_filter_out(ki, filter):
                     self.both_filter[keys].append(ki)
+        # filter case 1, filter out all same items
         self.both_filter_diff=self.both_filter.copy()
         self.both_filter_diff.pop("all-same")
+        # filter case 2, for self.both_filter['callable'], remove specific items
+        self.both_filter_diff["callable"]=list()
+        for i in self.both_filter["callable"]:
+            if i.k not in filter["callable"]:
+                self.both_filter_diff["callable"].append(i)
+
 
     def filter_out(self, filter=DEFAULT_FILTER, whitelist=None):
         self.filter_out_added(filter, whitelist)
@@ -135,10 +146,10 @@ def _split_objs_key(obj1, obj2, kl):
                         ret['var-diff'].append(kinfo(k,type(getattr(obj1,k))))
                 except:
                     print("except:===", k)
-            else:
+            else:                            # case3: callable object
                 try:
                     if getattr(obj1,k).__code__ is getattr(obj2,k).__code__:
-                        ret["all-same"].append(kinfo(k,type(getattr(obj1,k))))
+                        ret["all-same"].append(kinfo(k,type(getattr(obj1,k)))) # case3: callable object and __code__ is same
                     else:
                         ret['callable'].append(kinfo(k,type(getattr(obj1,k))))
                 except:
