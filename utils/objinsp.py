@@ -48,6 +48,7 @@ class comp_ret():
         self.added=_split_obj_key(obj2, self.k_added)
         self.removed=_split_obj_key(obj1, self.k_removed)
         self.both=_split_objs_key(self.obj1, self.obj2, self.k_both)
+        self.filter_out()
     
     def filter_out_added(self, filter=DEFAULT_FILTER, whitelist=None):
         self.added_filter=dict()
@@ -153,5 +154,12 @@ def _split_objs_key(obj1, obj2, kl):
                     else:
                         ret['callable'].append(kinfo(k,type(getattr(obj1,k))))
                 except:
-                    ret['callable'].append(kinfo(k,type(getattr(obj1,k))))
+                   # print("Fail:", k,type(getattr(obj1,k)))
+                    try:
+                        if getattr(obj1,k) is getattr(obj2,k):
+                            ret["all-same"].append(kinfo(k,type(getattr(obj1,k))))
+                        else:
+                            ret['callable'].append(kinfo(k,type(getattr(obj1,k))))
+                    except:
+                        ret['callable'].append(kinfo(k,type(getattr(obj1,k))))
     return ret
