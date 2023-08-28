@@ -3,4 +3,5 @@
 - CMD
 ```
 $ python run_squad.py --device cpu --dtype bfloat16 --jit --ipex --threads 2
+$ python s.py
 ```
