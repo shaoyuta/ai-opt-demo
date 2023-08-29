@@ -38,25 +38,20 @@ def inference(model, device, eval_loader, num_perf_steps, num_warmup_steps, test
         for it, batch in enumerate(eval_loader):
             if i + 1 > total_steps:
                 break
-            if args.data_dir:
-                inputs = {
-                    "input_ids": batch[0],
-                    "attention_mask": batch[1],
-                    "token_type_ids": batch[2],
-                }
-            else:
-                inputs = {
-                    "input_ids": batch["input_ids"],
-                    "attention_mask": batch["attention_mask"],
-                    "token_type_ids": batch["token_type_ids"],
-                }
+            inputs = {
+                "input_ids": batch["input_ids"],
+                "attention_mask": batch["attention_mask"],
+                "token_type_ids": batch["token_type_ids"],
+            }
             if i == 0:
                 if args.jit:
                     model = save_jit_model(model, inputs, amp_dtype, device)
+                if args.compile:
+                    model = torch.compile(model)
             # Start benchmarking
             time_start = time.time()
             collate_fn_(inputs, device, amp_dtype)
-            outputs = model(**inputs)
+            model(**inputs)
             time_end = time.time()
 
             print("Iter {}, Time {}".format(i, time_end - time_start))
@@ -72,7 +67,6 @@ def inference(model, device, eval_loader, num_perf_steps, num_warmup_steps, test
 # args
 parser = argparse.ArgumentParser('BERT-Large squad benchmark script', add_help=False)
 parser.add_argument("--model-name-or-path", default="bert-large-uncased-whole-word-masking-finetuned-squad", type=str, help="bert-large model name or path")
-parser.add_argument("--data-dir", default=None,  type=str, help="Dataset dir")
 parser.add_argument("--device", default="cpu", type=str, help="device")
 parser.add_argument("--dtype",
         type=str,
@@ -82,13 +76,13 @@ parser.add_argument("--dtype",
     )
 parser.add_argument('--jit', action='store_true')
 parser.add_argument('--ipex', action='store_true')
-parser.add_argument('--use-hpu-graph', action='store_true')
-parser.add_argument("--num-iter", default=2, type=int, help="num iter")
-parser.add_argument("--num-warmup", default=1, type=int, help="num warmup")
+parser.add_argument('--compile', action='store_true')
+parser.add_argument("--num-iter", default=4, type=int, help="num iter")
+parser.add_argument("--num-warmup", default=2, type=int, help="num warmup")
 parser.add_argument("--batch-size", default=32, type=int, help="batch size")
 parser.add_argument("--max-length", default=384, type=int, help="The maximum length of a feature (question and context)")
 parser.add_argument("--doc-stride", default=128, type=int, help="The authorized overlap between two part of the context when splitting it is needed.")
-parser.add_argument("--threads", default=1, type=int, help="threads number to process dataset, better to use cores per instance")
+
 args = parser.parse_args()
 print(args)
 
@@ -119,17 +113,19 @@ model = AutoModelForQuestionAnswering.from_pretrained(args.model_name_or_path, t
 model = model.to(memory_format=torch.channels_last)
 model.eval()
 model = model.to(device)
+
+
+
 # ipex optimization
 if args.ipex:
     model = ipex.optimize(model, dtype=amp_dtype, inplace=True)
 
 
 # load data & tokenize
-if args.data_dir is None:
-    dataset = load_dataset("squad", split="validation")
-    def tokenize_function(data):
-        return tokenizer(data["question"], data["context"], padding='max_length', truncation="only_second", max_length=args.max_length, stride=args.doc_stride, return_tensors="pt")
-    eval_dataset = dataset.map(tokenize_function, batched=True, remove_columns=['id', 'title', 'context', 'question', 'answers']).with_format("torch")
+dataset = load_dataset("squad", split="validation")
+def tokenize_function(data):
+    return tokenizer(data["question"], data["context"], padding='max_length', truncation="only_second", max_length=args.max_length, stride=args.doc_stride, return_tensors="pt")
+eval_dataset = dataset.map(tokenize_function, batched=True, remove_columns=['id', 'title', 'context', 'question', 'answers']).with_format("torch")
 
 eval_sampler = SequentialSampler(eval_dataset)  # or default value: None. might impact perf
 eval_loader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.batch_size)
