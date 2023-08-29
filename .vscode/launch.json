@@ -73,6 +73,38 @@
                 "ONEDNN_VERBOSE": "1",
                 "TRANSFORMERS_OFFLINE" : "1"
             }
+        },
+        {
+            "name": "bert: ipex ipex",
+            "type": "python",
+            "request": "launch",
+            "program": "bertlarge/s.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args":[
+                "--dtype=bfloat16",
+                "--jit", "--ipex"
+            ],
+            "env":{
+                "ONEDNN_VERBOSE": "1",
+                "TRANSFORMERS_OFFLINE" : "1"
+            }
+        },
+        {
+            "name": "bert: compile",
+            "type": "python",
+            "request": "launch",
+            "program": "bertlarge/s.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args":[
+                "--dtype=bfloat16",
+                "--compile"
+            ],
+            "env":{
+                "ONEDNN_VERBOSE": "1",
+                "TRANSFORMERS_OFFLINE" : "1"
+            }
         }
     ]
 }
