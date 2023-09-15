@@ -105,6 +105,25 @@
                 "ONEDNN_VERBOSE": "1",
                 "TRANSFORMERS_OFFLINE" : "1"
             }
-        }
+        },
+        {
+            "name": "PyTorch: gdb",
+            "type": "cppdbg",
+            "request": "attach",
+            "MIMode": "gdb",
+            "program":"/home/taosy/bin/miniconda3/envs/pt-39-6/bin/python",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }
