@@ -3,5 +3,5 @@ cmake_minimum_required (VERSION 3.5)
 project(subprojects)
 
 # Add sub directories
-add_subdirectory(tp1)
+add_subdirectory(demo1)
 
