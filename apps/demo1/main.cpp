@@ -1,68 +1,48 @@
-#include <iostream>
 #include "gflags/gflags.h"
-#include <time.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
+#include <chrono>
+#include <condition_variable>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <unistd.h>
 
-DEFINE_string(m, "Hello world!", "Message to print");
 DEFINE_uint32(N, 1, "nof threads");
 DEFINE_uint32(p, 1, "period (s)");
+
 using namespace std;
+using namespace std::chrono_literals;
 
-pthread_mutex_t calculating = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t done = PTHREAD_COND_INITIALIZER;
+typedef void (*test_fun)(void);
 
-void *expensive_call(void *data)
-{
-   int oldtype;
-   pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, &oldtype);
-   for (;;) {}
-   pthread_cond_signal(&done);
-   return NULL;
+void run_period_with_n_thrds(int p, int n, test_fun fun) {
+  std::mutex m;
+  std::condition_variable cv;
+
+  for (int i; i < n; i++) {
+    std::thread t([&cv, &fun]() {
+      fun();
+      cv.notify_one();
+    });
+    t.detach();
+  }
+
+  {
+    std::unique_lock<std::mutex> l(m);
+    sleep(p);
+  } 
 }
 
-
-int do_or_timeout(struct timespec *max_wait)
-{
-   struct timespec abs_time;
-   pthread_t tid;
-   int err;
-
-   pthread_mutex_lock(&calculating);
-
-   clock_gettime(CLOCK_REALTIME, &abs_time);
-   abs_time.tv_sec += max_wait->tv_sec;
-   abs_time.tv_nsec += max_wait->tv_nsec;
-
-   for(int n=0; n<FLAGS_N; n++){
-      pthread_create(&tid, NULL, expensive_call, NULL);
-   }
-
-   err = pthread_cond_timedwait(&done, &calculating, &abs_time);
-
-   if (err == ETIMEDOUT)
-      fprintf(stderr, "%s: calculation timed out\n", __func__);
-
-   if (!err)
-            pthread_mutex_unlock(&calculating);
-
-   return err;
+void busyloop() {
+  while (1) {
+  };
+  return;
 }
 
-int main(int argc, char *argv[])
-{
-   gflags::ParseCommandLineFlags(&argc, &argv, true);
+int main(int argc, char *argv[]) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-   struct timespec max_wait;
+  run_period_with_n_thrds(FLAGS_p, FLAGS_N, busyloop);
 
-   memset(&max_wait, 0, sizeof(max_wait));
-
-   /* wait at most 2 seconds */
-   max_wait.tv_sec = FLAGS_p;
-   do_or_timeout(&max_wait);
-
-   gflags::ShutDownCommandLineFlags();
-   return 0;
+  gflags::ShutDownCommandLineFlags();
+  return 0;  
 }
