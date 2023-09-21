@@ -4,4 +4,5 @@ project(subprojects)
 
 # Add sub directories
 add_subdirectory(demo1)
+add_subdirectory(tmp)
 

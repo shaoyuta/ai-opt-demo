@@ -4,10 +4,10 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Set the project name
-project (demo1)
+project (tmp)
 
 find_package(gflags REQUIRED)
 
 # Add an executable
-add_executable(demo1 main.cpp)
-target_link_libraries(demo1 gflags)
+add_executable(tmp main.cpp)
+target_link_libraries(tmp gflags)
