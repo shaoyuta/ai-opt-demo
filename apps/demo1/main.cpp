@@ -43,13 +43,39 @@ void dummy(){
   sleep(-1);
 }
 
+void cpu_utilization(){
+#if 0
+  int time_start;
+  int fulltime = 100;//总时间
+  int runtime = 50;//运行时间
+#else
+  float ratio=40;
+  float r=ratio/100;
+  float a=1/r-1;
+  unsigned int ut=a*1000;
+#endif
+   while(1){
+#if 0
+      time_start = clock();
+      while((clock()-time_start)<runtime){}
+      usleep(runtime);
+#else
+      for(unsigned int i=0; i<300000; i++){}
+      usleep(ut);
+#endif
+   }
+   return;
+}
+
 int main(int argc, char *argv[]) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  if (FLAGS_t == "busy")
-    run_period_with_n_thrds(FLAGS_p, FLAGS_N, busyloop);
-  if (FLAGS_t == "dummy")
-    run_period_with_n_thrds(FLAGS_p, FLAGS_N, dummy);
+   if (FLAGS_t == "busy")
+      run_period_with_n_thrds(FLAGS_p, FLAGS_N, busyloop);
+   if (FLAGS_t == "dummy")
+      run_period_with_n_thrds(FLAGS_p, FLAGS_N, dummy);
+   if (FLAGS_t == "cpu")
+      run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu_utilization);
 
   gflags::ShutDownCommandLineFlags();
   return 0;  
