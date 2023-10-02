@@ -125,5 +125,90 @@
                 }
             ]
         },
+        {
+            "name": "gdb: perf script",
+            "type": "cppdbg",
+            "request":"launch",
+            "MIMode": "gdb",
+            "program":"/home/taosy/repo/github/linux/tools/perf/perf",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "cwd":"/home/taosy/repo/github/linux/tools/perf",
+            "args":[
+                "script",
+                "-D",
+                "-i",
+                "/home/taosy/perf/5/perf.data"
+            ],
+            "environment": [
+                { "name": "PERF_EXEC_PATH", "value": "/home/taosy/repo/github/linux/tools/perf" }
+            ]
+        },
+        {
+            "name": "gdb: perf record",
+            "type": "cppdbg",
+            "request":"launch",
+            "MIMode": "gdb",
+            "program":"/home/taosy/repo/github/linux/tools/perf/perf",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "cwd":"/home/taosy/repo/github/linux/tools/perf",
+            "args":[
+                "record",
+                "--output=/home/taosy/perf/5/perf.data",
+                "ls",
+            ],
+            "environment": [
+                { "name": "PERF_EXEC_PATH", "value": "/home/taosy/repo/github/linux/tools/perf" }
+            ]
+        },
+        {
+            "name": "gdb: perf report",
+            "type": "cppdbg",
+            "request":"launch",
+            "MIMode": "gdb",
+            "program":"/home/taosy/repo/github/linux/tools/perf/perf",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "cwd":"/home/taosy/repo/github/linux/tools/perf",
+            "args":[
+                "report",
+                "--input=/home/taosy/perf/6/perf.data",
+                "--stdio",
+            ],
+            "environment": [
+                { "name": "PERF_EXEC_PATH", "value": "/home/taosy/repo/github/linux/tools/perf" }
+            ]
+        },
     ]
 }
