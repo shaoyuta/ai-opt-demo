@@ -1,3 +1,7 @@
+'''
+utils for convert excel row to int, for example:
+'ab' => 28 => (28-3) = 25 => cpu freq core25
+'''
 import math
 
 def __c2n(c):
@@ -12,7 +16,7 @@ def c2n(c):
     lst[:]=c
     length=len(lst)
     for i, c in enumerate(lst):
-        v += (__c2n(c))*math.pow(26,(length-i-1))
+        v += (__c2n(c)+1)*math.pow(26,(length-i-1))
     return int(v)
 
 def n2c(n):
@@ -22,6 +26,11 @@ def n2c(n):
     n -= v2 * 26 
     v3 = n
     v = [ v1, v2, v3]
-    r = [ __n2c(i) for i in v]
-    return "".join(r)
+    ret=[]
+    for i in v:
+        if i==0 :
+            continue
+        else:
+            ret.append(__n2c(i-1))
+    return "".join(ret)
     
