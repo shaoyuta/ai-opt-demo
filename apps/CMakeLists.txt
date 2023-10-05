@@ -5,4 +5,5 @@ project(subprojects)
 # Add sub directories
 add_subdirectory(demo1)
 add_subdirectory(tmp)
+add_subdirectory(perf-sample)
 
