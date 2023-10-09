@@ -3,6 +3,8 @@
 # $ cmake --version
 cmake_minimum_required(VERSION 3.5)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 # Set the project name
 project (demo1)
 
