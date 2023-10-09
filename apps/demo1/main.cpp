@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
    if (FLAGS_t == "cpu")
       run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu_utilization);
    if (FLAGS_t == "amx")
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu_utilization);
+      run_period_with_n_thrds(FLAGS_p, FLAGS_N, loop_amx_test);
 
   gflags::ShutDownCommandLineFlags();
   return 0;  

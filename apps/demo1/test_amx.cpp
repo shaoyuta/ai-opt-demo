@@ -101,6 +101,7 @@ static bool set_tiledata_use()
 /* Print int8_t buffer */
 static void print_buffer(int8_t* buf, int32_t rows, int32_t colsb) 
 {
+#if 0
    for (int i = 0; i < rows; i++) {
      for (int j = 0; j < (colsb); j++)
      {
@@ -109,11 +110,13 @@ static void print_buffer(int8_t* buf, int32_t rows, int32_t colsb)
      printf("\n");
    }
    printf("\n");
+#endif
 }
 
 /* Print int32_t buffer */
 static void print_buffer32(int32_t* buf, int32_t rows, int32_t colsb)
 {
+#if 0
    for (int i = 0; i < rows; i++) {
      for (int j = 0; j < (colsb); j++)
      {
@@ -122,6 +125,7 @@ static void print_buffer32(int32_t* buf, int32_t rows, int32_t colsb)
      printf("\n");
    }
    printf("\n");
+#endif
 }
 
 void test_amx_main(){
@@ -142,10 +146,10 @@ void test_amx_main(){
 
    // Init src matrix buffers with data
    init_buffer (src1, 2);
-//   print_buffer(src1, rows, colsb);
+   print_buffer(src1, rows, colsb);
  
    init_buffer (src2, 2);
-//   print_buffer(src2, rows, colsb);
+   print_buffer(src2, rows, colsb);
 
    // Init dst matrix buffers with data
    init_buffer32 (res, 0);
@@ -160,7 +164,7 @@ void test_amx_main(){
 
    // Store the tile data to memory
    _tile_stored (1, res, STRIDE);
-//   print_buffer32(res, rows, colsb/4);
+   print_buffer32(res, rows, colsb/4);
 
    // Release the tile configuration to return to the init state, 
    // which releases all storage it currently holds
