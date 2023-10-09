@@ -15,6 +15,8 @@ using namespace std::chrono_literals;
 
 typedef void (*test_fun)(void);
 
+extern void test_amx_main(void);
+
 void run_period_with_n_thrds(int p, int n, test_fun fun) {
   std::mutex m;
   std::condition_variable cv;
@@ -41,6 +43,12 @@ void busyloop() {
 
 void dummy(){
   sleep(-1);
+}
+
+void loop_amx_test(){
+  while(1){
+    test_amx_main();
+  }
 }
 
 void cpu_utilization(){
@@ -75,6 +83,8 @@ int main(int argc, char *argv[]) {
    if (FLAGS_t == "dummy")
       run_period_with_n_thrds(FLAGS_p, FLAGS_N, dummy);
    if (FLAGS_t == "cpu")
+      run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu_utilization);
+   if (FLAGS_t == "amx")
       run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu_utilization);
 
   gflags::ShutDownCommandLineFlags();

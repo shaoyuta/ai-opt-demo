@@ -3,6 +3,7 @@
 # $ cmake --version
 cmake_minimum_required(VERSION 3.5)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=sapphirerapids")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 # Set the project name
@@ -11,5 +12,5 @@ project (demo1)
 find_package(gflags REQUIRED)
 
 # Add an executable
-add_executable(demo1 main.cpp)
+add_executable(demo1 main.cpp test_amx.cpp)
 target_link_libraries(demo1 gflags)
