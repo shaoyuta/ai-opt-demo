@@ -12,5 +12,5 @@ project (demo1)
 find_package(gflags REQUIRED)
 
 # Add an executable
-add_executable(demo1 main.cpp test_amx.cpp)
+add_executable(demo1 main.cpp test_amx.cpp test_avx512.cpp)
 target_link_libraries(demo1 gflags)
