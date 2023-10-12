@@ -6,6 +6,7 @@
 #include <thread>
 #include <unistd.h>
 #include <functional>
+#include "tc.h"
 
 DEFINE_string(t,"busy","tasks");
 DEFINE_uint32(N, 1, "nof threads");
@@ -14,20 +15,19 @@ DEFINE_uint32(p, 1, "period (s)");
 using namespace std;
 using namespace std::chrono_literals;
 
-typedef void (*test_fun)(void);
-
 // extern test func
 extern void test_amx_main(void);
 extern void test_avx512_main(void);
 extern void test_mem_main(void);
 
-void cpu_utilization(){
+void cpu_utilization(int d){
 #if 0
   int time_start;
   int fulltime = 100;//总时间
   int runtime = 50;//运行时间
 #else
-  float ratio=40;
+//  cout<<d<<endl;
+  float ratio=(float)d;
   float r=ratio/100;
   float a=1/r-1;
   unsigned int ut=a*1000;
@@ -45,15 +45,10 @@ void cpu_utilization(){
    return;
 }
 
-typedef struct t_TestCase {
-  function<bool(t_TestCase *tcase)> prepare_hook;  // Null: no need to prepare, Func() -> False: return; True: go ahead
-  function<void(t_TestCase *tcase)> run;
-  function<bool(t_TestCase *tcase)> post_hook;
-  int argc;
-  char** argv;
-}TestCase;
+
 
 TestCase demo={
+  .tc_name = "demo",
   .prepare_hook=[](TestCase* pcase){
      cout<< "demo: in prepare"<<endl;
      return true;
@@ -70,20 +65,27 @@ TestCase demo={
 };
 
 TestCase busy={
+  .tc_name = "busy",
   .run=[](TestCase* pcase){
     while(1){};
     return;
   },
 };
 
+/*
+-t "cpu" -- 50
+*/
 TestCase cpu={
+  .tc_name = "cpu",
   .run=[](TestCase* pcase){
-    cpu_utilization();
+    int r = std::stoi( pcase->argv[0] );
+    cpu_utilization(r);
     return;
   },
 };
 
 TestCase amx={
+  .tc_name = "amx",
   .run=[](TestCase* pcase){
     test_amx_main();
     return;
@@ -91,6 +93,7 @@ TestCase amx={
 };
 
 TestCase mem={
+  .tc_name = "mem",
   .run=[](TestCase* pcase){
     test_mem_main();
     return;
@@ -98,6 +101,7 @@ TestCase mem={
 };
 
 TestCase avx512={
+  .tc_name = "avx512",
   .run=[](TestCase* pcase){
     test_avx512_main();
     return;
@@ -131,37 +135,20 @@ void _pass_args(TestCase& tcase, int argc, char** argv){
   tcase.argv=argv;
 }
 
+void prepare_tcs(){
+  init_tc_set();
+  register_tc(busy);
+  register_tc(cpu);
+  register_tc(amx);
+  register_tc(avx512);
+  register_tc(mem);
+}
+
 int main(int argc, char *argv[]) {
 
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  if (FLAGS_t == "demo"){
-      _pass_args(demo, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, demo);
-  }
-  if (FLAGS_t == "busy"){
-      _pass_args(busy, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, busy);
-  }
-  if (FLAGS_t == "cpu"){
-      _pass_args(cpu, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, cpu);
-  }
-
-  if (FLAGS_t == "amx"){
-      _pass_args(amx, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, amx);
-  }
-
-  if (FLAGS_t == "mem"){
-      _pass_args(mem, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, mem);
-  }
-
-  if (FLAGS_t == "avx512"){
-      _pass_args(avx512, argc-1, argv+1);
-      run_period_with_n_thrds(FLAGS_p, FLAGS_N, avx512);
-  }
-   
+  prepare_tcs();
+  run_tc(FLAGS_t, FLAGS_p, FLAGS_N, argc-1, argv+1);
   gflags::ShutDownCommandLineFlags();
   return 0;  
 }
