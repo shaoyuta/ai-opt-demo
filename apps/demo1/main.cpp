@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 // extern test func
 extern void test_amx_main(void);
 extern void test_avx512_main(void);
-extern void test_mem_main(void);
+extern void test_mem_main(int sg);
 
 void cpu_utilization(int d){
 #if 0
@@ -78,7 +78,12 @@ TestCase busy={
 TestCase cpu={
   .tc_name = "cpu",
   .run=[](TestCase* pcase){
-    int r = std::stoi( pcase->argv[0] );
+    int r;
+    if( pcase->argc >0 ){
+      r = std::stoi( pcase->argv[0] );
+    }else{
+      r=40;
+    }
     cpu_utilization(r);
     return;
   },
@@ -92,10 +97,14 @@ TestCase amx={
   },
 };
 
+/*
+-t 'mem' -- 4 => alloc 4G
+*/
 TestCase mem={
   .tc_name = "mem",
   .run=[](TestCase* pcase){
-    test_mem_main();
+    int sg = std::stoi( pcase->argv[0] );
+    test_mem_main(sg);
     return;
   },
 };

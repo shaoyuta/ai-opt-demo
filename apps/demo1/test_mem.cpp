@@ -9,7 +9,6 @@ using namespace std;
 using namespace std::chrono_literals;
 
 
-#define SIZE 0x1000000000
 
 unsigned long long getTotalSystemMemory()
 {
@@ -18,12 +17,14 @@ unsigned long long getTotalSystemMemory()
     return pages * page_size;
 }
 
-void test_mem_main(void) {
+void test_mem_main(int sg) {
   int* a;
-  a=(int*)malloc(SIZE);
+  unsigned long long size=sg*0x400*0x400;
+  size *= 0x400;
+  a=(int*)malloc(size);
   if (a == 0)
     return ;
-  for( unsigned long i=0; i<SIZE; i+=sizeof(int)){
+  for( unsigned long i=0; i<size; i+=sizeof(int)){
      a[i>>2]=0x99;
   }
   free(a);
