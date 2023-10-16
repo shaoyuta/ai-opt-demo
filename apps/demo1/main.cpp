@@ -144,8 +144,8 @@ void _pass_args(TestCase& tcase, int argc, char** argv){
   tcase.argv=argv;
 }
 
-void prepare_tcs(){
-  init_tc_set();
+
+__attribute__((constructor)) void prepare_tcs(){
   register_tc(busy);
   register_tc(cpu);
   register_tc(amx);
@@ -153,10 +153,10 @@ void prepare_tcs(){
   register_tc(mem);
 }
 
+
 int main(int argc, char *argv[]) {
 
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  prepare_tcs();
   run_tc(FLAGS_t, FLAGS_p, FLAGS_N, argc-1, argv+1);
   gflags::ShutDownCommandLineFlags();
   return 0;  

@@ -18,6 +18,7 @@ typedef struct t_TestCase {
   function<bool(t_TestCase *tcase)> post_hook;
   int argc;
   char** argv;
+  struct t_TestCase* next;
 }TestCase;
 
 extern void prepare_tcs();

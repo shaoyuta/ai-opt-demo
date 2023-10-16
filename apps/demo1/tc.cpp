@@ -12,27 +12,23 @@
 #define N 0x20
 TestCase *tc_set[N];
 
-void init_tc_set(){
-    memset((void*)tc_set, 0, sizeof(TestCase *)*N);
-}
+TestCase* pTCHeader=nullptr;
 
 bool register_tc(TestCase &tcase){
-    for( int i=0; i<N; i++){
-        if( tc_set[i] != 0 )
-            continue;
-        else{
-            tc_set[i]=&tcase;
-            return true;
-        }
-    }
+    TestCase** p=&pTCHeader;
+    while( *p )
+        p=&(*p)->next;
+    *p = &tcase;
+    (*p)->next=nullptr;
     return true;
 }
 
 void run_tc(string tc_name, unsigned int p, unsigned int nof_thrds, int argc, char** argv){
-    for( int i=0; i<N; i++){
-        if( tc_set[i]!=0 && tc_name == tc_set[i]->tc_name){
-            _pass_args(*tc_set[i], argc, argv);
-            run_period_with_n_thrds(p, nof_thrds, *tc_set[i]);
+    TestCase* pTC=pTCHeader;
+    while(p){
+        if( tc_name == pTC->tc_name){
+            _pass_args(*pTC, argc, argv);
+            run_period_with_n_thrds(p, nof_thrds, *pTC);
             return ;
         }
     }
