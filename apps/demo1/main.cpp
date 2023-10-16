@@ -62,6 +62,10 @@ void run_period_with_n_thrds(int p, int n, TestCase tcase) {
     std::unique_lock<std::mutex> l(m);
     sleep(p);
   }
+
+  if( tcase.post_hook) 
+    tcase.post_hook(&tcase);
+  return ;
 }
 
 void _pass_args(TestCase& tcase, int argc, char** argv){
@@ -71,6 +75,7 @@ void _pass_args(TestCase& tcase, int argc, char** argv){
 
 
 REGISTER_TC(busy);
+REGISTER_TC(demo);
 
 int main(int argc, char *argv[]) { 
 
