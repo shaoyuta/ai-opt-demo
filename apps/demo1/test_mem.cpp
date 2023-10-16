@@ -9,13 +9,14 @@
 using namespace std;
 using namespace std::chrono_literals;
 
+static unsigned long long g_total_size;
 
-
-unsigned long long getTotalSystemMemory()
+static void getTotalSystemMemory()
 {
     long pages = sysconf(_SC_PHYS_PAGES);
     long page_size = sysconf(_SC_PAGE_SIZE);
-    return pages * page_size;
+    g_total_size = pages * page_size;
+    return;
 }
 
 void test_mem_main(int sg) {
@@ -36,9 +37,14 @@ void test_mem_main(int sg) {
 */
 TestCase mem={
   .tc_name = "mem",
+  .prepare_hook=[](TestCase* pcase){
+     getTotalSystemMemory();
+     return true;
+  },
   .run=[](TestCase* pcase){
     int sg = std::stoi( pcase->argv[0] );
-    test_mem_main(sg);
+    while(1)
+      test_mem_main(sg);
     return;
   },
 };
