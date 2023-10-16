@@ -10,6 +10,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include "tc.h"
 
 #define MAX 1024
 #define MAX_ROWS 16
@@ -170,3 +171,12 @@ void test_amx_main(){
    // which releases all storage it currently holds
    _tile_release ();
 }
+
+TestCase amx={
+  .tc_name = "amx",
+  .run=[](TestCase* pcase){
+    test_amx_main();
+    return;
+  },
+};
+REGISTER_TC(amx);

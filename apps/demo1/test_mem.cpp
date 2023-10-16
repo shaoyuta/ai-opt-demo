@@ -4,6 +4,7 @@
 #include <mutex>
 #include <thread>
 #include <unistd.h>
+#include "tc.h"
 
 using namespace std;
 using namespace std::chrono_literals;
@@ -24,8 +25,22 @@ void test_mem_main(int sg) {
   a=(int*)malloc(size);
   if (a == 0)
     return ;
-  for( unsigned long i=0; i<size; i+=sizeof(int)){
+  for( unsigned long long i=0; i<size; i+=sizeof(int)){
      a[i>>2]=0x99;
   }
   free(a);
 }
+
+/*
+-t 'mem' -- 4 => alloc 4G
+*/
+TestCase mem={
+  .tc_name = "mem",
+  .run=[](TestCase* pcase){
+    int sg = std::stoi( pcase->argv[0] );
+    test_mem_main(sg);
+    return;
+  },
+};
+
+REGISTER_TC(mem);

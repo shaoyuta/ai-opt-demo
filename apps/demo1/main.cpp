@@ -15,38 +15,6 @@ DEFINE_uint32(p, 1, "period (s)");
 using namespace std;
 using namespace std::chrono_literals;
 
-// extern test func
-extern void test_amx_main(void);
-extern void test_avx512_main(void);
-extern void test_mem_main(int sg);
-
-void cpu_utilization(int d){
-#if 0
-  int time_start;
-  int fulltime = 100;//总时间
-  int runtime = 50;//运行时间
-#else
-//  cout<<d<<endl;
-  float ratio=(float)d;
-  float r=ratio/100;
-  float a=1/r-1;
-  unsigned int ut=a*1000;
-#endif
-   while(1){
-#if 0
-      time_start = clock();
-      while((clock()-time_start)<runtime){}
-      usleep(runtime);
-#else
-      for(unsigned int i=0; i<300000; i++){}
-      usleep(ut);
-#endif
-   }
-   return;
-}
-
-
-
 TestCase demo={
   .tc_name = "demo",
   .prepare_hook=[](TestCase* pcase){
@@ -72,50 +40,7 @@ TestCase busy={
   },
 };
 
-/*
--t "cpu" -- 50
-*/
-TestCase cpu={
-  .tc_name = "cpu",
-  .run=[](TestCase* pcase){
-    int r;
-    if( pcase->argc >0 ){
-      r = std::stoi( pcase->argv[0] );
-    }else{
-      r=40;
-    }
-    cpu_utilization(r);
-    return;
-  },
-};
 
-TestCase amx={
-  .tc_name = "amx",
-  .run=[](TestCase* pcase){
-    test_amx_main();
-    return;
-  },
-};
-
-/*
--t 'mem' -- 4 => alloc 4G
-*/
-TestCase mem={
-  .tc_name = "mem",
-  .run=[](TestCase* pcase){
-    int sg = std::stoi( pcase->argv[0] );
-    test_mem_main(sg);
-    return;
-  },
-};
-
-TestCase avx512={
-  .tc_name = "avx512",
-  .run=[](TestCase* pcase){
-    test_avx512_main();
-    return;
-  },
-};
 
 void run_period_with_n_thrds(int p, int n, TestCase tcase) {
 
@@ -145,16 +70,9 @@ void _pass_args(TestCase& tcase, int argc, char** argv){
 }
 
 
-__attribute__((constructor)) void prepare_tcs(){
-  register_tc(busy);
-  register_tc(cpu);
-  register_tc(amx);
-  register_tc(avx512);
-  register_tc(mem);
-}
+REGISTER_TC(busy);
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) { 
 
   gflags::ParseCommandLineFlags(&argc, &argv, true);
   run_tc(FLAGS_t, FLAGS_p, FLAGS_N, argc-1, argv+1);

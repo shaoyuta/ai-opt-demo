@@ -13,6 +13,6 @@ project (demo1)
 find_package(gflags REQUIRED)
 
 # Add an executable
-add_executable(demo1 main.cpp tc.cpp test_amx.cpp test_avx512.cpp test_mem.cpp)
+add_executable(demo1 main.cpp tc.cpp test_amx.cpp test_avx512.cpp test_mem.cpp test_cpu.cpp)
 target_link_libraries(demo1 gflags_static -static)  #static link
 #target_link_libraries(demo1 gflags)  #dynamic link

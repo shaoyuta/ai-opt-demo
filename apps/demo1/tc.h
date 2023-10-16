@@ -11,6 +11,11 @@
 
 using namespace std;
 
+#define REGISTER_TC(tcname) \
+void __attribute__((constructor)) register_tc_##tcname(){ \
+  register_tc(tcname); \
+};
+
 typedef struct t_TestCase {
   string tc_name;
   function<bool(t_TestCase *tcase)> prepare_hook;  // Null: no need to prepare, Func() -> False: return; True: go ahead

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <x86intrin.h>
+#include "tc.h"
 
 #define N           0xfffffff
 #define SEED        0x1234
@@ -42,3 +43,12 @@ void test_avx512_main(void) {
     free(b);
     free(c);
 }
+
+TestCase avx512={
+  .tc_name = "avx512",
+  .run=[](TestCase* pcase){
+    test_avx512_main();
+    return;
+  },
+};
+REGISTER_TC(avx512);
