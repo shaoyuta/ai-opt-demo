@@ -1,3 +1,10 @@
+#!/bin/bash -e
+
+# Create workspace and create link
+# mkdir -p ~/llm/1-c4709ac180e
+# ln -s ../common ~/llm/common
+# ln -s ../workspace ~/llm/1-c4709ac180e/workspace
+
 conda create -n pt-39 python=3.9 -y
 conda activate pt-39
 
