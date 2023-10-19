@@ -34,7 +34,7 @@ else
     echo "BEAM: 4" 
 fi
 
-source /home/workspace/oneCCL/build/_install/env/setvars.sh
+source /home/taosy/llm/1-c4709ac180e/oneCCL/build/_install/env/setvars.sh   #FIXME
 unset KMP_AFFINITY
 if [ "${MODE}" == "accuracy" ]; then
     echo "DS_TP: ${NUMA_NODES}"
@@ -60,6 +60,8 @@ else
         EXEC_ARGS+=" --ki"
     fi
 fi
+
+EVAL_SCRIPT=${WL_PATH}/${EVAL_SCRIPT}
 
 # execute parameters
 if [ "${PRECISION}" == "amx_bfloat16" ]; then
