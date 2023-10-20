@@ -34,7 +34,7 @@ else
     echo "BEAM: 4" 
 fi
 
-source /home/taosy/llm/1-c4709ac180e/oneCCL/build/_install/env/setvars.sh   #FIXME
+#source /home/taosy/llm/1-c4709ac180e/oneCCL/build/_install/env/setvars.sh   #FIXME
 unset KMP_AFFINITY
 if [ "${MODE}" == "accuracy" ]; then
     echo "DS_TP: ${NUMA_NODES}"
