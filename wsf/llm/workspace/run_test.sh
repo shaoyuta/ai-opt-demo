@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "$0" )" &> /dev/null && pwd )"
 
 trap WL_unsetenv EXIT
 
-source settings.sh
+source ${DIR}/settings.sh
 WL_setenv
 
 export LD_PRELOAD=${CONDA_PREFIX}/lib/libstdc++.so.6
@@ -76,8 +76,8 @@ if [ ! -h ${WL_PATH}/prompt.json ]; then
 fi
 
 if [[ "${USE_DEEPSPEED}" == "True" ]]; then
-    ./run_test_deepspeed.sh
+    ${DIR}/run_test_deepspeed.sh
 else
-    ./run_test_general.sh
+    ${DIR}/run_test_general.sh
 fi
 
