@@ -244,5 +244,29 @@
             "miDebuggerPath":"/home/taosy/bin/anaconda3/envs/pt-1/bin/gdb",
             "cwd":"${workspaceFolder}",
         },
+        {
+            "name": "demo1",
+            "type": "cppdbg",
+            "request":"launch",
+            "MIMode": "gdb",
+            "program":"${workspaceFolder}/build/demo1/demo1",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath":"/home/taosy/bin/anaconda3/envs/pt-1/bin/gdb",
+            "cwd":"${workspaceFolder}",
+            "args":[
+                "-N=1", "-p=30", "-t='simd_avx'"
+            ]
+        },
     ]
 }

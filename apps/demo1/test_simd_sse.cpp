@@ -6,7 +6,7 @@
 #include "test_simd_common.h"
 
 void test_simd_sse_main(void) {
-    test_x86_sse_fp32();
+    test_x86_sse_fp64();
 }
 
 TestCase simd_sse={

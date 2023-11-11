@@ -79,7 +79,42 @@ void test_x86_sse_fp64(void)
     addpd %%xmm13, %%xmm13 ;\
     mulpd %%xmm14, %%xmm14 ;\
     addpd %%xmm15, %%xmm15 ;\
-    jmp .cpufp.x86.sse.fp32.L1 ;\
+    jmp .cpufp.x86.sse.fp64.L1 ;\
+    ret \
+	"
+	: : :
+	);
+}
+
+void test_x86_avx_fp64(void){
+        asm(" \
+	vxorpd %%ymm0, %%ymm0, %%ymm0; \
+	vxorpd %%ymm1, %%ymm1, %%ymm1; \
+    vxorpd %%ymm2, %%ymm2, %%ymm3; \
+    vxorpd %%ymm0, %%ymm0, %%ymm4; \
+    vxorpd %%ymm0, %%ymm0, %%ymm5; \
+    vxorpd %%ymm0, %%ymm0, %%ymm6; \
+    vxorpd %%ymm0, %%ymm0, %%ymm7; \
+    vxorpd %%ymm0, %%ymm0, %%ymm8; \
+    vxorpd %%ymm9, %%ymm9, %%ymm9; \
+    vxorpd %%ymm10, %%ymm10, %%ymm10; \
+    vxorpd %%ymm11, %%ymm11, %%ymm11; \
+    vxorpd %%ymm12, %%ymm12, %%ymm12; \
+.cpufp.x86.avx.fp64.L1: ;\
+	vmulpd %%ymm12, %%ymm12, %%ymm0 ;\
+	vaddpd %%ymm12, %%ymm12, %%ymm1 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm2 ;\
+    vaddpd %%ymm12, %%ymm12, %%ymm3 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm4 ;\
+    vaddpd %%ymm12, %%ymm12, %%ymm5 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm6 ;\
+    vaddpd %%ymm12, %%ymm12, %%ymm7 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm8 ;\
+    vaddpd %%ymm12, %%ymm12, %%ymm9 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm10 ;\
+    vaddpd %%ymm12, %%ymm12, %%ymm11 ;\
+    vmulpd %%ymm12, %%ymm12, %%ymm11 ;\
+    jmp .cpufp.x86.avx.fp64.L1 ;\
     ret \
 	"
 	: : :

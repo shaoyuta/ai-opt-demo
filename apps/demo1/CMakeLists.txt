@@ -23,7 +23,8 @@ SET(SOURCES
     main.cpp tc.cpp
     test_amx.cpp
     test_simd_common.cpp
-    test_sse.cpp
+    test_simd_sse.cpp
+    test_simd_avx.cpp
     test_avx512.cpp
     test_mem.cpp
     test_cpu.cpp
