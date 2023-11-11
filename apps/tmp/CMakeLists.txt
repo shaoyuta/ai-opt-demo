@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.5)
 
 # Set the project name
 project (tmp)
-
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -march=native")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 find_package(gflags REQUIRED)
 
 # Add an executable

@@ -210,5 +210,39 @@
                 { "name": "PERF_EXEC_PATH", "value": "/home/taosy/repo/github/linux/tools/perf" }
             ]
         },
+        {
+            "name": "t2.sh",
+            "type": "bashdb",
+            "request": "launch",
+            "program": "${workspaceFolder}/utils/t2.sh",
+            "terminalKind": "integrated",     
+            "args":[
+                "-c", "/home/taosy/llama2/1-c4709ac180e/workspace/run_test.sh",
+                "-s", "Iteration",
+                "-e", "Summary"
+            ],
+
+        },
+        {
+            "name": "tmp",
+            "type": "cppdbg",
+            "request":"launch",
+            "MIMode": "gdb",
+            "program":"${workspaceFolder}/build/tmp/tmp",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath":"/home/taosy/bin/anaconda3/envs/pt-1/bin/gdb",
+            "cwd":"${workspaceFolder}",
+        },
     ]
 }

@@ -15,4 +15,4 @@
 ### version of gflags is too low, no static file
 - solution: 
     - conda install gflags (conda can provide >2.2 )
-    - build and install gflags from source code 
+    - build and install gflags from source code

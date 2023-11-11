@@ -1,7 +1,9 @@
 #!/bin/bash -e
 
-DIR="$( cd "$( dirname "$0" )" &> /dev/null && pwd )"
+set -e
 
+DIR="$( cd "$( dirname "$0" )" &> /dev/null && pwd )"
+echo ${DIR}
 trap WL_unsetenv EXIT
 
 source ${DIR}/settings.sh
