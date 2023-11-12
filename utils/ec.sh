@@ -91,6 +91,6 @@ fi
 
 if [[ ${PARSE_RESULT} = "true" ]] && [[ -f ${EMON_DATA_PATH} ]]; then
     python  /usr/local/emon/sep/config/edp/pyedp/edp.py     \
-   -m /usr/local/emon/sep/config/edp/icelake_server_2s_nda.xml     \
+   -m /usr/local/emon/sep/config/edp/sapphirerapids_server_2s_private.xml     \
    -i ${EMON_DATA_PATH}  -o ${EMON_DATA_PATH}.xlsx --socket-view --core-view --thread-view
 fi
