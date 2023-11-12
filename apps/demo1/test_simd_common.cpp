@@ -120,3 +120,33 @@ void test_x86_avx_fp64(void){
 	: : :
 	);
 }
+
+
+void test_x86_avx512_fp64(void){
+        asm(" \
+	vpxorq %%zmm0, %%zmm0, %%zmm0; \
+	vpxorq %%zmm1, %%zmm1, %%zmm1; \
+    vpxorq %%zmm2, %%zmm2, %%zmm3; \
+    vpxorq %%zmm0, %%zmm0, %%zmm4; \
+    vpxorq %%zmm0, %%zmm0, %%zmm5; \
+    vpxorq %%zmm0, %%zmm0, %%zmm6; \
+    vpxorq %%zmm0, %%zmm0, %%zmm7; \
+    vpxorq %%zmm0, %%zmm0, %%zmm8; \
+    vpxorq %%zmm9, %%zmm9, %%zmm9; \
+.cpufp.x86.avx512.fp64.L1: ;\
+	vfmadd231pd %%zmm12, %%zmm12, %%zmm0 ;\
+	vfmadd231pd %%zmm12, %%zmm12, %%zmm1 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm2 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm3 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm4 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm5 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm6 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm7 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm8 ;\
+    vfmadd231pd %%zmm12, %%zmm12, %%zmm9 ;\
+    jmp .cpufp.x86.avx512.fp64.L1 ;\
+    ret \
+	"
+	: : :
+	);
+}

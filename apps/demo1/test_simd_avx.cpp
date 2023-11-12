@@ -17,3 +17,17 @@ TestCase simd_avx={
   },
 };
 REGISTER_TC(simd_avx);
+
+
+void test_simd_avx512_main(void) {
+    test_x86_avx_fp64();
+}
+
+TestCase simd_avx512={
+  .tc_name = "simd_avx512",
+  .run=[](TestCase* pcase){
+    test_simd_avx512_main();
+    return;
+  },
+};
+REGISTER_TC(simd_avx512);
