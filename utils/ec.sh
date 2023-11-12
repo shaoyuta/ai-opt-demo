@@ -7,6 +7,7 @@ COMMAND=""
 EMON_DATA_PATH="emon.dat"
 STR_ROI_START=""
 STR_ROI_END=""
+PARSE_RESULT=false
 
 trace_started=false
 
@@ -17,9 +18,17 @@ Usage: $(basename "$0") [OPTION]...
 -s string of start_roi
 -e string of end_roi
 -c command
+-p parse result
 -h usage
 EOM
     exit 0
+}
+
+function validate_env(){
+    if [[ ! $(command -v emon) ]]; then
+        echo "emon not found"
+        exit 1
+    fi
 }
 
 function validate_args() {
@@ -30,12 +39,13 @@ function validate_args() {
 }
 
 function process_args() {
-    while getopts "f:s:e:c:" opt; do
+    while getopts "f:s:e:c:p" opt; do
         case $opt in
         f) EMON_DATA_PATH=("$OPTARG");;
         s) STR_ROI_START=("$OPTARG");;
         e) STR_ROI_END=("$OPTARG");;
         c) COMMAND=$OPTARG;;
+        p) PARSE_RESULT=true ;;
         h) usage;;
         *) usage;;
         esac
@@ -49,6 +59,7 @@ function _p(){
     echo str_roi_end: ${STR_ROI_END}
 }
 
+validate_env
 process_args "$@"
 validate_args
 
@@ -76,4 +87,10 @@ else
     wait 
     echo "::: finished"
 
+fi
+
+if [[ ${PARSE_RESULT} = "true" ]] && [[ -f ${EMON_DATA_PATH} ]]; then
+    python  /usr/local/emon/sep/config/edp/pyedp/edp.py     \
+   -m /usr/local/emon/sep/config/edp/icelake_server_2s_nda.xml     \
+   -i ${EMON_DATA_PATH}  -o ${EMON_DATA_PATH}.xlsx --socket-view --core-view --thread-view
 fi
