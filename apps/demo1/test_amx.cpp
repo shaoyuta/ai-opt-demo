@@ -85,6 +85,7 @@ static void init_buffer32 (int32_t *buf, int32_t value)
 /* Set_tiledata_use() - Invoke syscall to set ARCH_SET_STATE_USE */
 static bool set_tiledata_use()
 {
+#if 1
    if (syscall(SYS_arch_prctl, ARCH_REQ_XCOMP_PERM, XFEATURE_XTILEDATA)) 
    {
       printf("\n Fail to do XFEATURE_XTILEDATA \n\n");
@@ -95,7 +96,7 @@ static bool set_tiledata_use()
       printf("\n TILE DATA USE SET - OK \n\n");
       return true;
    }
-
+#endif
    return true;
 }
 
@@ -141,16 +142,14 @@ void test_amx_main(){
    // Request permission to linux kernel to run AMX 
    if (!set_tiledata_use())
       exit(-1);
-
+while(1){
    // Load tile configuration 
    init_tile_config (&tile_data);
 
    // Init src matrix buffers with data
    init_buffer (src1, 2);
-   print_buffer(src1, rows, colsb);
  
    init_buffer (src2, 2);
-   print_buffer(src2, rows, colsb);
 
    // Init dst matrix buffers with data
    init_buffer32 (res, 0);
@@ -165,11 +164,12 @@ void test_amx_main(){
 
    // Store the tile data to memory
    _tile_stored (1, res, STRIDE);
-   print_buffer32(res, rows, colsb/4);
+//   print_buffer32(res, rows, colsb/4);
 
    // Release the tile configuration to return to the init state, 
    // which releases all storage it currently holds
    _tile_release ();
+}
 }
 
 TestCase amx={
