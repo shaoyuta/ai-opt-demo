@@ -68,8 +68,8 @@ b= objinsp.comp_ret(model,fmodel)
 d= objinsp.comp_ret(model,omodel)
 ```
 
-- t.sh
-    - Which is used to capture emon for roi 
+- ec.sh
+    - Which is used to capture emon data by roi string
 ```
-./t.sh -c '/home/taosy/llama2/1-c4709ac180e/workspace/run_test.sh' -s 'Iteration: 2' -e 'Summary'
+./ec.sh -c '/home/taosy/llama2/1-c4709ac180e/workspace/run_test.sh' -s 'Iteration: 2' -e 'Summary'
 ```
