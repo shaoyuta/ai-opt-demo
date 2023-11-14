@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import pickle
 
-def get_emon_data(filename, fieldlist, infolist, sheetname=None):
+def get_emon_data(filename, fieldlist, sheetname=None):
     '''
     # flist=["metric_CPU operating frequency (in GHz)", "metric_uncore frequency GHz"]
     # infolist={"freq":"2.4Ghz", "cores":4, "iset":"amx"}
@@ -11,9 +11,13 @@ def get_emon_data(filename, fieldlist, infolist, sheetname=None):
     '''
     df = pd.read_excel(filename, sheet_name=sheetname, index_col=0, header=None)
     ret=dict()
-    for f in fieldlist:
-        ret[f]=df.loc[f][1]
-    return ret | infolist
+    try:
+        for f in fieldlist:
+            ret[f]=df.loc[f][1]
+    except:
+        print(filename)
+        pass
+    return ret
 
 def _parse_emon_filename(filename):
     r=dict()
@@ -42,7 +46,7 @@ def save_result(r, fn):
     r=_parse_emon_fold("/home/taosy/demo-emon/emon-spr/", flist, "socket view")
     save_result(r, 'test.pickle')
     '''
-    with open('fn', 'wb') as handle:
+    with open(fn, 'wb') as handle:
         pickle.dump(r, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def load_result(fn):
