@@ -31,9 +31,11 @@ echo "BATCH_SIZE: ${BATCH_SIZE}"
 echo "PRECISION: ${PRECISION}"
 echo "INPUT_TOKENS: ${INPUT_TOKENS}"
 echo "OUTPUT_TOKENS: ${OUTPUT_TOKENS}"
+echo "MODEL_NAME: ${MODEL_NAME}"
 echo "MODEL_PATH: ${MODEL_PATH}"
 echo "RANK_USE: ${RANK_USE}"
 echo "USE_DEEPSPEED": ${USE_DEEPSPEED}
+echo "MODEL_SIZE: ${MODEL_SIZE}"
 
 if [ "$ONEDNN_VERBOSE" == "1" ]; then
     export ONEDNN_VERBOSE=1
@@ -41,29 +43,6 @@ fi
 
 #pytorch version
 python -c "import torch; print(\"torch.version: \"+torch.__version__)"
-
-# Set ISA
-if [ "${TARGET_PLATFORM}" == "SRF" ]; then
-    export ONEDNN_MAX_CPU_ISA="AVX2_VNNI_2"
-else
-    ISA=$(echo ${PRECISION} | cut -d_ -f1)
-    REAL_PRECISION=$(echo ${PRECISION} | cut -d_ -f2)
-    if [ "${ISA}" == "avx" ]; then
-        export ONEDNN_MAX_CPU_ISA="AVX512_CORE_VNNI"
-        if [ "${PRECISION}" == "avx_int8" ]; then
-            export ATEN_CPU_CAPABILITY="avx512_vnni"
-            export _DNNL_GRAPH_DISABLE_COMPILER_BACKEND="1"
-        fi
-    elif [ "${PRECISION}" == "amx_bfloat16" ] || [ "${PRECISION}" == "amx_bfloat32" ] || [ "${PRECISION}" == "amx_int8" ]; then
-        export ONEDNN_MAX_CPU_ISA="AVX512_CORE_AMX"
-    elif [ "${PRECISION}" == "amx_fp16" ]; then
-        export ONEDNN_MAX_CPU_ISA="AVX512_CORE_AMX_FP16"
-        export DNNL_MAX_CPU_ISA="AVX512_CORE_AMX_FP16"
-    else
-        echo "Not support precision ${PRECISION}."
-        exit 1
-    fi
-fi
 
 export HF_HOME="${HOME}/.cache/huggingface/"
 export HF_DATASETS_OFFLINE=1
@@ -73,13 +52,49 @@ export TRANSFORMERS_CACHE=$HF_HOME/hub
 export HF_MODULES_CACHE=${TRANSFORMERS_CACHE}
 
 # WL specific settings
-if [ ! -h ${WL_PATH}/prompt.json ]; then
+if [ ! -e ${WL_PATH}/prompt.json ]; then
     ln -s ${DIR}/../common/prompt.json ${WL_PATH}/prompt.json
 fi
 
-if [[ "${USE_DEEPSPEED}" == "True" ]]; then
-    ${DIR}/run_test_deepspeed.sh
-else
-    ${DIR}/run_test_general.sh
+
+# quantization
+if [ ${PRECISION} == "woq_int8" ] || [ ${PRECISION} == "woq_int4" ] || [ ${PRECISION} == "static_int8" ]; then
+    if [ ! -f "${TRANSFORMERS_CACHE}/saved_results_${PRECISION}/best_model.pt" ]; then
+        QUANT_ARGS="-m ${MODEL_NAME} --int8-bf16-mixed --output-dir "${TRANSFORMERS_CACHE}/saved_results_${PRECISION}" "
+        QUANT_SCRIPT="run_llama_quantization.py"
+        if [ $PRECISION == "woq_int8" ]; then
+            QUANT_ARGS+="--ipex-weight-only-quantization  "
+        fi
+        if [ $PRECISION == "static_int8" ]; then
+            QUANT_ARGS+="--ipex-smooth-quant --alpha 0.5 --dataset lambada "
+        fi
+        if [ $PRECISION == "woq_int4" ]; then
+            # Step 1: Generate modified weights and quantization info
+            if [ ! -f "${TRANSFORMERS_CACHE}/saved_results_${PRECISION}/gptq_checkpoint.pt" ]; then
+                python utils/run_gptq.py --model ${MODEL_NAME} --output-dir ${TRANSFORMERS_CACHE}/saved_results_${PRECISION}
+            fi
+            # Step 3: Run quantized model for latency benchmark
+            QUANT_ARGS+="--ipex-weight-only-quantization --low-precision-checkpoint "${TRANSFORMERS_CACHE}/saved_results_${PRECISION}/gptq_checkpoint.pt"" 
+        fi
+        cd ./single_instance
+        echo "Run quantization cmd: python ${QUANT_SCRIPT} ${QUANT_ARGS}"
+        eval python ${QUANT_SCRIPT} ${QUANT_ARGS}
+        cd ..
+    fi
 fi
 
+if [ $USE_DEEPSPEED == "True" ]; then
+#    cd ./distributed
+    if [ $MODE == "accuracy" ]; then
+        ./distributed/run_distributed_accuracy.sh
+    else
+        ./distributed/run_distributed.sh
+    fi
+else
+#    cd ./single_instance
+    if [ $MODE == "accuracy" ]; then
+        ./single_instance/run_accuracy.sh
+    else
+        ./single_instance/run_single_instance.sh
+    fi
+fi

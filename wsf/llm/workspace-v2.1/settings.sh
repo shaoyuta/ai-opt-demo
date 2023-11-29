@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #WL Setting
-WL_PATH=/home/taosy/llm/1-c4709ac180e/frameworks.ai.pytorch.ipex-cpu/examples/cpu/inference/python/llm
+WL_PATH=/home/taosy/llm/v2.1/intel-extension-for-pytorch/examples/cpu/inference/python/llm/single_instance/
 
 OPTION=${1:-inference_latency_amx_bfloat16_pkm}
 PLATFORM=${PLATFORM:-SPR}
@@ -9,7 +9,7 @@ WORKLOAD=${WORKLOAD:-llama2_pytorch_dev}
 TOPOLOGY="Llama2"
 FUNCTION=$(echo ${OPTION}|cut -d_ -f1)
 MODE=$(echo ${OPTION}|cut -d_ -f2)
-PRECISION=$(echo ${OPTION}|cut -d_ -f3-4)
+PRECISION=${PRECISION:-bfloat16}
 CASE_TYPE=$(echo ${OPTION}|cut -d_ -f5)
 DATA_TYPE="real"
 BATCH_SIZE=${BATCH_SIZE:-1}
